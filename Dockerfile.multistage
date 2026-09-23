@@ -1,0 +1,28 @@
+# Stage 1: Build the application
+
+FROM eclipse-temurin:17-jdk AS builder
+
+WORKDIR /app
+
+COPY . .
+
+RUN ./mvnw clean package -DskipTests
+
+
+# Stage 2: Runtime image
+
+FROM eclipse-temurin:17-jre
+
+# Create a non-root user
+RUN useradd -r -u 1001 -g root petclinic
+
+WORKDIR /app
+
+COPY --from=builder /app/target/*.jar app.jar
+
+# Run the application as the non-root user
+USER petclinic
+
+EXPOSE 8080
+
+CMD ["java", "-jar", "app.jar"]

@@ -1,0 +1,38 @@
+services:
+
+  mysql:
+    image: mysql:9.7
+    container_name: petclinic-mysql
+
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: petclinic
+      MYSQL_USER: petclinic
+      MYSQL_PASSWORD: petclinic
+
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+
+  petclinic:
+    build:
+      context: .
+      dockerfile: Dockerfile.multistage
+
+    container_name: petclinic-app
+
+    depends_on:
+      - mysql
+
+    environment:
+      SPRING_PROFILES_ACTIVE: mysql
+      MYSQL_URL: jdbc:mysql://mysql:3306/petclinic
+      MYSQL_USER: petclinic
+      MYSQL_PASS: petclinic
+
+    ports:
+      - "8080:8080"
+
+
+volumes:
+  mysql-data:
