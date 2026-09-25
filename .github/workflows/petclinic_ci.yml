@@ -53,3 +53,4 @@ jobs:
           -Dsonar.organization=spring-petclinic-devops
           -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
           -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+          -Dsonar.qualitygate.wait=true
