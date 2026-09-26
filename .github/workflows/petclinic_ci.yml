@@ -69,13 +69,23 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build -f Dockerfile.multistage -t spring-petclinic:latest .
+        run: docker build -f Dockerfile.multistage -t ${{ secrets.NEXUS_URL }}/spring-petclinic:latest .
 
       - name: Scan Docker Image With Trivy
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: spring-petclinic:latest
+          image-ref: ${{ secrets.NEXUS_URL }}/spring-petclinic:latest
           format: table 
           severity: 'CRITICAL,HIGH'
           exit-code: '0'
           ignore-unfixed: true
+
+      - name: Log in to Nexus
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.NEXUS_URL }}
+          username: ${{ secrets.NEXUS_USERNAME }}
+          password: ${{ secrets.NEXUS_PASSWORD }}
+
+      - name: Push Docker Image to Nexus
+        run: docker push ${{ secrets.NEXUS_URL }}/spring-petclinic:latest
